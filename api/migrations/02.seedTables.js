@@ -25,6 +25,19 @@ await coffeeCard.addTag(ecoTag);
 await momBirthday.addTag(urgentTag);
 await reblochonCard.addTag(urgentTag);
 
+await User.bulkCreate([
+    {
+      username: "admin1",
+      password: "$argon2d$v=19$m=12,t=3,p=1$cTZzaGZyYWVjbXMwMDAwMA$C9dIoPQ6c4GqyuqelB/4ug"
+    },
+    {
+      username: "admin2",
+      password: "$argon2d$v=19$m=12,t=3,p=1$M3p2bGZnNW9pd2wwMDAwMA$xFnN/EOvoHK11CTqzyBz3w"
+    }
+  ]);
+
+  console.log("✅ Users, Tags, Lists & Cards seeded successfully !");
+
 
 console.log("✅ Migration OK ! Fermeture de la base..."); // On ferme le tunnel de connexion pour que le script s'arrête bien
 await sequelize.close();
