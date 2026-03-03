@@ -1,6 +1,8 @@
 import { User } from "../models/index.js";
 import { StatusCodes } from "http-status-codes";
 import argon2 from "argon2";
+import jwt from "jsonwebtoken";
+import "dotenv/config";
 
 export async function registerUser(req, res) {
     // Hasher le mdp avec argon2
@@ -22,5 +24,31 @@ export async function registerUser(req, res) {
 }
 
 export async function loginUser(req, res) {
-    // On va pouvoir gerer la connexion 
+    // On va pouvoir gerer la connexion d'un utilisateur
+    // On tente de recuperer un utilisateur via son id
+    const user = await User.findOne({
+        where: {
+            username: req.body.username
+        }
+    })
+    // Si l'utilisateur n'existe pas ou que le mot de passe n'est pas bon
+    if(!user || !await argon2.verify(user.password, req.body.password)) {
+        return res.status(StatusCodes.UNAUTHORIZED).json({ error: "Invalid username or password" });
+    }
+
+    // on a generer un token JWT qui contient l'id de l'utilisateur et qui expire dans 1h
+    const token = jwt.sign({ user_id: user.id }, process.env.JWT_SECRET, { 
+        expiresIn: "1h" 
+    });
+    
+
+    // Si tout est bon, on genere un token JWT
+    /*if(!user || !argon2.verify(user.password, req.body.password)) {
+        return res.status(StatusCodes.UNAUTHORIZED).json({ error: "Invalid username or password" });
+    } else {
+        res.status(StatusCodes.OK).json({message: "Connection successfull"});
+    }*/
+
+
+    res.status(StatusCodes.OK).json({ token });
 }
