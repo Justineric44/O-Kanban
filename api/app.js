@@ -8,6 +8,7 @@ import listRoutes from "./routes/list.routes.js";
 import cardRoutes from "./routes/card.routes.js";
 import tagRoutes from "./routes/tag.routes.js";
 import authRoutes from "./routes/auth.routes.js";
+import { authenticate } from "./middlewares/auth.middleware.js";
 
 const PORT = process.env.PORT || 3000;
 
@@ -18,10 +19,14 @@ app.use(cors());
 app.use(xss());
 app.use(express.json());
 
+app.use("/auth", authRoutes);
+
+app.use(authenticate); // Middleware pour protéger les routes suivantes, il vérifie que l'utilisateur est authentifié avant de lui permettre d'accéder aux routes protégées
+
 app.use("/lists", listRoutes);
 app.use("/cards", cardRoutes);
 app.use("/tags", tagRoutes);
-app.use("/auth", authRoutes);
+
 
 
 app.use(errorHandler);
