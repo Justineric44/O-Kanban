@@ -1,4 +1,5 @@
-import { Card, List, Tag, sequelize } from "../models/index.js";
+import { Card, List, Tag, User, sequelize } from "../models/index.js";
+import argon2 from "argon2";
 
 console.log("🚧 Ajout de listes de test...");
 const shoppingList  = await List.create({ title: "Liste des courses", position: 1 });
@@ -25,18 +26,10 @@ await coffeeCard.addTag(ecoTag);
 await momBirthday.addTag(urgentTag);
 await reblochonCard.addTag(urgentTag);
 
-await User.bulkCreate([
-    {
-      username: "admin1",
-      password: "$argon2d$v=19$m=12,t=3,p=1$cTZzaGZyYWVjbXMwMDAwMA$C9dIoPQ6c4GqyuqelB/4ug"
-    },
-    {
-      username: "admin2",
-      password: "$argon2d$v=19$m=12,t=3,p=1$M3p2bGZnNW9pd2wwMDAwMA$xFnN/EOvoHK11CTqzyBz3w"
-    }
-  ]);
+console.log("🚧 Ajout de users...");
+await User.create({username: "admin", password: await argon2.hash("admin")});
+await User.create({username: "morgan", password: await argon2.hash("morgan")});
 
-  console.log("✅ Users, Tags, Lists & Cards seeded successfully !");
 
 
 console.log("✅ Migration OK ! Fermeture de la base..."); // On ferme le tunnel de connexion pour que le script s'arrête bien

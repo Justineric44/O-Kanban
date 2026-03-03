@@ -56,19 +56,19 @@
   </div>
   <div class="flex-none">
     <ul class="menu menu-horizontal px-1">
-      <!-- {#if !isAuthenticated()} -->
+      {#if !isAuthenticated()}
       <li>
         <button onclick={() => openModal(`register`)}>Inscription</button>
       </li>
       <li>
         <button onclick={() => openModal(`login`)}>Connexion</button>
       </li>
-      <!-- {:else}
+      {:else}
         <li>
           Hello, {authStore.user.username || "undefined"} !
           <button onclick={clearAuth}>Déconnexion</button>
         </li>
-      {/if} -->
+      {/if} 
     </ul>
   </div>
 </div>

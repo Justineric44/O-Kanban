@@ -74,7 +74,7 @@
 
 <Navbar />
 
-<!-- {#if isAuthenticated()} -->
+{#if isAuthenticated()}
 <section class="container mx-auto pr-8">
   <div class="flex justify-between mt-4">
     <!-- {#if authStore.user.role.name === "admin"} -->
@@ -129,7 +129,7 @@
     {/if}
   </div>
 </section>
-<!-- {:else}
+{:else} 
   <section class="container mx-auto pr-8">
     <div class="flex justify-center mt-4">
       <h1 class="text-2xl font-bold">
@@ -137,4 +137,4 @@
       </h1>
     </div>
   </section>
-{/if} -->
+{/if} 

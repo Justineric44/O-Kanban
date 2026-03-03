@@ -1,46 +1,26 @@
-import argon2 from "argon2";
 import { User } from "../models/index.js";
+import { StatusCodes } from "http-status-codes";
+import argon2 from "argon2";
 
 export async function registerUser(req, res) {
-  try {
-    const { username, password, passwordConfirm } = req.body;
+    // Hasher le mdp avec argon2
+    const hashedPassword = await argon2.hash(req.body.password);
 
-    // Vérifier confirmation mot de passe
-    if (password !== passwordConfirm) {
-      return res.status(400).json({
-        error: "Les mots de passe ne correspondent pas"
-      });
+    try {
+        // Enregistrer l'utilisateur
+        const user = await User.create({ username: req.body.username, password: hashedPassword });
+        // On renvoit l'id et le username de notre nouvel user
+        res.status(StatusCodes.CREATED).json({ id: user.id, username: user.username });
+    } catch (error) {
+        // Cette erreur sera levée si le username n'est pas unique
+        if (error.name === "SequelizeUniqueConstraintError") {
+            return res.status(StatusCodes.CONFLICT).json({ error: "Username already exists" });
+        }
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Internal Server Error" });
     }
 
-    // Vérifier unicité du pseudo
-    const existingUser = await User.findOne({
-      where: { username }
-    });
+}
 
-    if (existingUser) {
-      return res.status(409).json({
-        error: "Ce pseudo est déjà utilisé"
-      });
-    }
-
-    // Hash du mot de passe
-    const hashedPassword = await argon2.hash(password);
-
-    // Création utilisateur
-    const user = await User.create({
-      username,
-      password: hashedPassword
-    });
-
-    // Supprimer le password de la réponse
-    const { password: _, ...userWithoutPassword } = user.toJSON();
-
-    return res.status(201).json(userWithoutPassword);
-
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      error: "Erreur interne du serveur"
-    });
-  }
+export async function loginUser(req, res) {
+    // On va pouvoir gerer la connexion 
 }
