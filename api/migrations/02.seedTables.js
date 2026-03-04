@@ -1,4 +1,4 @@
-import { Card, List, Role, Tag, User, sequelize } from "../models/index.js";
+import { Card, List, Tag, User, Role, sequelize } from "../models/index.js";
 import argon2 from "argon2";
 
 console.log("🚧 Ajout de listes de test...");
@@ -26,9 +26,9 @@ await coffeeCard.addTag(ecoTag);
 await momBirthday.addTag(urgentTag);
 await reblochonCard.addTag(urgentTag);
 
-console.log("🚧 Ajout de rôles...");
-const adminRole = await Role.create({ name: "admin" });
-const userRole  = await Role.create({ name: "user" });
+console.log("🚧 Ajout de roles...");
+const adminRole = await Role.create({name: "admin"});
+const userRole = await Role.create({name: "user"});
 
 console.log("🚧 Ajout de users...");
 await User.create({username: "admin", password: await argon2.hash("admin"), role_id: adminRole.id});

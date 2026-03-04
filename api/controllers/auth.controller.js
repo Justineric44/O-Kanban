@@ -15,7 +15,7 @@ export async function registerUser(req, res) {
                 name: "user"
             }
         });
-        console.log(userRole);
+
         // Enregistrer l'utilisateur avec un role par defaut user
         const user = await User.create({ username: req.body.username, password: hashedPassword, role_id: userRole.id });
         // On renvoit l'id et le username de notre nouvel user
@@ -25,7 +25,7 @@ export async function registerUser(req, res) {
         if (error.name === "SequelizeUniqueConstraintError") {
             return res.status(StatusCodes.CONFLICT).json({ error: "Username already exists" });
         }
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error });
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Internal Server Error" });
     }
 
 }
@@ -60,7 +60,8 @@ export async function loginUser(req, res) {
 export async function getConnectedUser(req, res) {
     // req.user.user_id
     const user = await User.findByPk(req.user.user_id, {
-        attributes: ["id", "username"]
+        attributes: ["id", "username"],
+        include: "role"
     });
 
     if(!user) {

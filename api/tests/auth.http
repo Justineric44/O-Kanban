@@ -1,13 +1,13 @@
 @BASE_URL=http://localhost:3000
-@TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJpYXQiOjE3NzI2MTQxNjcsImV4cCI6MTc3MjYxNzc2N30.0nibBSBYr_FqPHqM8ReuWkxA6yzanSCfjMJV2XqSs5k"
+@TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJpYXQiOjE3NzI2Mjk4NTAsImV4cCI6MTc3MjYzMzQ1MH0.vkx4PWd5OCXPXZvYI2-45zF7mGP1NbjRAwzICIm6jk0
 
 ### Register user
 POST {{BASE_URL}}/auth/register
 Content-Type: application/json
 
 {
-    "username": "azerty",
-    "password": "123456789"
+    "username": "admin",
+    "password": "123"
 }
 
 
@@ -22,4 +22,4 @@ Content-Type: application/json
 
 ### Get Current user info
 GET {{BASE_URL}}/auth/me
-Authorization: Bearer @{{TOKEN}}
+Authorization: Bearer {{TOKEN}}

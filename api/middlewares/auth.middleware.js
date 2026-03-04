@@ -3,6 +3,7 @@ import { checkBody } from "../utils/common.util.js";
 import { StatusCodes } from "http-status-codes";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
+import { User } from "../models/index.js";
 
 
 export function validateUserRegistration(req, res, next) {
@@ -22,33 +23,63 @@ export function validateUserLogin(req, res, next) {
     checkBody(userLoginSchema, req.body, res, next);
 }
 
-// Ce middleware va verifier si il y a un token dans la requete et si il est valide, sinon il retourne une erreur 401 Unauthorized
-// Et si le token est valide  (ce qui sera fait dans le service d'authentification)
+// Ce middleware va verifier si il y a un token dans la requete
+// Et si le token est valide
 export function authenticate(req, res, next) {
-    // Ici, on recupere le token si il existe dans le header Authorization de la requete
+    // Ici, on recupere le token si il existe
     const authHeader = req.headers.authorization;
 
-    // Si le token n'existe pas ou qu'il ne commence pas par Bearer, on retourne une erreur 401 Unauthorized avec un message d'erreur   
+    // Si le token n'existe pas ou qu'il ne commence pas par Bearer
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
         return res
             .status(StatusCodes.UNAUTHORIZED)
             .json({ error: "Authorization token missing or invalid" });
     }
-    // On sépare le token du mot "Bearer" et on stocke uniquement le token dans req.token pour pouvoir l'utiliser dans les routes protégées
+
+    // On separer notre chaine de caractere sur espace, et on garde la partie apres.
+    // On recupere uniquement le token
     const token = authHeader.split(" ")[1];
+
     try {
-        // On vérifie la validité du token en utilisant la méthode verify de jsonwebtoken et en passant le token et la clé secrète (qui doit être stockée dans une variable d'environnement)
+        // JWT verifie que le token est valide et qu'il n'est pas expiré
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        // ici on ajoute à la requete, l'id de l'utlisateur connecté, son username et son role (si besoin) pour pouvoir les utiliser dans les routes protégées
+        // Ici, on ajoute a la requete l'id de l'utilisateur connecté
+        //@TODO Verifier que l'user_id correspond a un utilisateur existant
         req.user = decoded;
-        // On passe au middleware suivant ou à la route protégée
         next();
     } catch (error) {
-        // Si le token n'est pas valide, on retourne une erreur 401 Unauthorized avec un message d'erreur
         return res
             .status(StatusCodes.UNAUTHORIZED)
-            .json({ error: "Invalid or expiredtoken" });
-        
+            .json({ error: "Invalid or expired token" });
     }
 }
 
+// On utilise cette syntaxe en poupée russe pour
+// Permettre de passer un parametre a notre middleware
+export function isAllowed(requiredRole) {
+    return async (req, res, next) => {
+        // On va recuperer le role de l'utilisateur connecté.
+        const user = await User.findByPk(req.user.user_id, {
+            include: "role"
+        });
+
+        if(!user) {
+            return res.status(StatusCodes.NOT_FOUND).json({ error: "User not found" });
+        }
+        // On va comparer ce role avec le role attendu
+        // Si on est admin, on a forcement le droit
+        if(user.role.name === "admin" || user.role.name === requiredRole) {
+            return next();
+        }
+
+        return res.status(StatusCodes.FORBIDDEN).json({ error: "Access denied" });
+
+        // Si on n'a pas le role demandé
+        /*if(user.role.name !== requiredRole) {
+            return res.status(StatusCodes.FORBIDDEN).json({ error: "Access denied" });
+        }
+        next();*/
+
+
+    }
+}
