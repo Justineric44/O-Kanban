@@ -2,7 +2,7 @@ import express from "express";
 import { getAll, getById, create, update, deleteById } from '../controllers/card.controller.js';
 import { validateCardCreation, validateCardUpdate } from '../middlewares/card.middleware.js';
 import { validateId } from '../middlewares/common.middleware.js';
-import { isAllowed } from '../middlewares/auth.middleware.js';
+import { isAllowed } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
