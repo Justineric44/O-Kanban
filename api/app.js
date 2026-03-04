@@ -23,7 +23,7 @@ app.use("/auth", authRoutes);
 
 // Ce middleware s'applique a toutes les routes suivantes, mais pas aux precedentes
 app.use(authenticate);
-
+// Les routes suivantes sont protégées par le middleware d'authentification
 app.use("/lists", listRoutes);
 app.use("/cards", cardRoutes);
 app.use("/tags", tagRoutes);

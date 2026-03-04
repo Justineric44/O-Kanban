@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 import "dotenv/config";
 import { User } from "../models/index.js";
 
-
+// Ce middleware va valider les données d'inscription de l'utilisateur
 export function validateUserRegistration(req, res, next) {
     const userRegistrationSchema = Joi.object({
         username: Joi.string().max(100).required(),
@@ -14,7 +14,7 @@ export function validateUserRegistration(req, res, next) {
     });
     checkBody(userRegistrationSchema, req.body, res, next);
 }
-
+// Ce middleware va valider les données de connexion de l'utilisateur
 export function validateUserLogin(req, res, next) {
     const userLoginSchema = Joi.object({
         username: Joi.string().required(),
@@ -54,32 +54,45 @@ export function authenticate(req, res, next) {
     }
 }
 
-// On utilise cette syntaxe en poupée russe pour
-// Permettre de passer un parametre a notre middleware
 export function isAllowed(requiredRole) {
     return async (req, res, next) => {
-        // On va recuperer le role de l'utilisateur connecté.
-        const user = await User.findByPk(req.user.user_id, {
-            include: "role"
-        });
-
-        if(!user) {
+        // Récupérer l'utilisateur connecté
+        const user = await User.findByPk(req.user.user_id, { include: "role" });
+        // Vérifier que l'utilisateur existe
+        if (!user) {
             return res.status(StatusCodes.NOT_FOUND).json({ error: "User not found" });
         }
-        // On va comparer ce role avec le role attendu
-        // Si on est admin, on a forcement le droit
-        if(user.role.name === "admin" || user.role.name === requiredRole) {
-            return next();
-        }
 
-        return res.status(StatusCodes.FORBIDDEN).json({ error: "Access denied" });
-
-        // Si on n'a pas le role demandé
-        /*if(user.role.name !== requiredRole) {
+        // Vérifier le rôle : admin ou rôle requis
+        if (user.role.name !== "admin" && user.role.name !== requiredRole) {
             return res.status(StatusCodes.FORBIDDEN).json({ error: "Access denied" });
         }
-        next();*/
 
+        // 🔒 Filtrage dynamique des champs autorisés pour PATCH
+        // Seules les requêtes PATCH sur les routes /cards et /lists sont concernées
+        if (req.method === "PATCH") {
+                // Si la route concerne les cartes, on autorise uniquement les champs position et list_id
+            if (req.path.startsWith("/cards")) {
+                // On définit les champs autorisés pour la mise à jour des cartes
+                const allowedFields = ["position", "list_id"];
+                // On filtre les champs de req.body pour ne garder que ceux autorisés
+                req.body = Object.fromEntries(
+                    // Object.entries transforme l'objet req.body en tableau de paires [clé, valeur]
+                    Object.entries(req.body).filter(([key]) => allowedFields.includes(key))
+                );
+            }
+            // Si la route concerne les listes, on autorise uniquement le champ position
+            if (req.path.startsWith("/lists")) {
+                // On définit les champs autorisés pour la mise à jour des listes
+                const allowedFields = ["position"];
+                // On filtre les champs de req.body pour ne garder que ceux autorisés
+                req.body = Object.fromEntries(
+                    // Object.entries transforme l'objet req.body en tableau de paires [clé, valeur]
+                    Object.entries(req.body).filter(([key]) => allowedFields.includes(key))
+                );
+            }
+        }
 
-    }
+        next();
+    };
 }
