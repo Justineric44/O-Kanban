@@ -1,5 +1,8 @@
+@BASE_URL=http://localhost:3000
+@TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJpYXQiOjE3NzI2MTQxNjcsImV4cCI6MTc3MjYxNzc2N30.0nibBSBYr_FqPHqM8ReuWkxA6yzanSCfjMJV2XqSs5k"
+
 ### Register user
-POST http://localhost:3000/auth/register
+POST {{BASE_URL}}/auth/register
 Content-Type: application/json
 
 {
@@ -9,10 +12,14 @@ Content-Type: application/json
 
 
 ### Login user
-POST http://localhost:3000/auth/login
+POST {{BASE_URL}}/auth/login
 Content-Type: application/json
 
 {
-    "username": "admin",
-    "password": "admin"
+    "username": "morgan",
+    "password": "morgan"
 }
+
+### Get Current user info
+GET {{BASE_URL}}/auth/me
+Authorization: Bearer @{{TOKEN}}

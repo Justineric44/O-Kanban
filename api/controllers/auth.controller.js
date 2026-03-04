@@ -35,14 +35,11 @@ export async function loginUser(req, res) {
     if(!user || !await argon2.verify(user.password, req.body.password)) {
         return res.status(StatusCodes.UNAUTHORIZED).json({ error: "Invalid username or password" });
     }
-
-    // on a generer un token JWT qui contient l'id de l'utilisateur et qui expire dans 1h
-    const token = jwt.sign({ user_id: user.id }, process.env.JWT_SECRET, { 
-        expiresIn: "1h" 
-    });
     
-
-    // Si tout est bon, on genere un token JWT
+    // On a generé un token avec une date d'expiration de 1h00
+    const token = jwt.sign({user_id: user.id}, process.env.JWT_SECRET, {
+        expiresIn: "1h"
+    });
     /*if(!user || !argon2.verify(user.password, req.body.password)) {
         return res.status(StatusCodes.UNAUTHORIZED).json({ error: "Invalid username or password" });
     } else {
@@ -51,4 +48,17 @@ export async function loginUser(req, res) {
 
 
     res.status(StatusCodes.OK).json({ token });
+}
+
+export async function getConnectedUser(req, res) {
+    // req.user.user_id
+    const user = await User.findByPk(req.user.user_id, {
+        attributes: ["id", "username"]
+    });
+
+    if(!user) {
+        return res.status(StatusCodes.NOT_FOUND).json({ error: "User not found" });
+    }
+    res.status(StatusCodes.OK).json(user);
+
 }

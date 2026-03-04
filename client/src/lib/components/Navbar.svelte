@@ -21,7 +21,7 @@
 
       // setAuth(user, token);
 
-      setAuth(username, token);
+      setAuth(user, token);
 
       const modal = document.getElementById(`login`);
       modal.close(); // Close the modal after adding the list
@@ -68,7 +68,7 @@
           Hello, {authStore.user.username || "undefined"} !
           <button onclick={clearAuth}>Déconnexion</button>
         </li>
-      {/if} 
+      {/if}
     </ul>
   </div>
 </div>
