@@ -1,4 +1,4 @@
-import { User } from "../models/index.js";
+import { User, Role } from "../models/index.js";
 import { StatusCodes } from "http-status-codes";
 import argon2 from "argon2";
 import jwt from "jsonwebtoken";
@@ -9,8 +9,15 @@ export async function registerUser(req, res) {
     const hashedPassword = await argon2.hash(req.body.password);
 
     try {
-        // Enregistrer l'utilisateur
-        const user = await User.create({ username: req.body.username, password: hashedPassword });
+        // Ici, on recupere le role user pour avoir son ID
+        const userRole = await Role.findOne({
+            where: {
+                name: "user"
+            }
+        });
+        console.log(userRole);
+        // Enregistrer l'utilisateur avec un role par defaut user
+        const user = await User.create({ username: req.body.username, password: hashedPassword, role_id: userRole.id });
         // On renvoit l'id et le username de notre nouvel user
         res.status(StatusCodes.CREATED).json({ id: user.id, username: user.username });
     } catch (error) {
@@ -18,7 +25,7 @@ export async function registerUser(req, res) {
         if (error.name === "SequelizeUniqueConstraintError") {
             return res.status(StatusCodes.CONFLICT).json({ error: "Username already exists" });
         }
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Internal Server Error" });
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error });
     }
 
 }
