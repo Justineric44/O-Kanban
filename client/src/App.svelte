@@ -10,6 +10,7 @@
     updateList,
   } from "./lib/services/list.service";
   import { getCards } from "./lib/services/card.service";
+  import { callMistral } from "./lib/services/mistral.service";
   import { form } from "./lib/store/form.svelte";
   import ModalForm from "./lib/components/modals/ModalForm.svelte";
   import { authStore, getAuth, isAuthenticated } from "./lib/store/auth.svelte";
@@ -22,7 +23,7 @@
         getCards(list.id).then((cards) => {
           list.cards = cards.sort((a, b) => a.position - b.position); // Trier les cartes par la propriété position
           return list;
-        })
+        }),
       );
 
       Promise.all(promises).then((completedLists) => {
@@ -70,66 +71,82 @@
       form.error = "Une erreur s'est produite lors de la création de la liste.";
     }
   };
+
+  // Variable pour stocker la réponse
+  let mistralResponse = $state("");
+
+  // Fonction qui appelle le service et récupère la réponse
+  const handleMistralClick = async () => {
+    const response = await callMistral("Quel temps fait-il à Nantes ? Fait une phrase de 255 caractères maximum (sans préciser le nombre de caractères).");
+    mistralResponse = response;
+  };
 </script>
 
 <Navbar />
 
 {#if isAuthenticated()}
-<section class="container mx-auto pr-8">
-  <div class="flex justify-between mt-4">
-    {#if authStore.user.role.name === "admin"}
-    <button
-      onclick={() => openModal(`add-list`)}
-      class="bg-blue-500 text-white px-4 py-2 rounded">Add List</button
-    >
-    <ModalForm title="Ajouter une liste" modalId={`add-list`} msg="">
-      <div class="flex flex-col gap-2">
-        <form onsubmit={addList}>
-          <input
-            type="text"
-            name="text"
-            class="input mb-4"
-            placeholder="Nom de la liste"
-            required
-          />
+  <section class="container mx-auto pr-8">
+    <div class="flex justify-start mt-4 gap-2">
+      {#if authStore.user.role.name === "admin"}
+        <button
+          onclick={() => openModal(`add-list`)}
+          class="bg-blue-500 text-white px-4 py-2 rounded">Add List</button
+        >
+        <button
+          onclick={handleMistralClick}
+          class="bg-blue-950 text-white px-4 py-2 rounded">Météo à Nantes</button
+        >{#if mistralResponse}
+          <div>{mistralResponse}</div>
+        {/if}
 
-          <div class="flex justify-center">
-            <button class="bg-blue-500 text-white px-2 py-1 rounded"
-              >Ajouter</button
-            >
+        <ModalForm title="Ajouter une liste" modalId={`add-list`} msg="">
+          <div class="flex flex-col gap-2">
+            <form onsubmit={addList}>
+              <input
+                type="text"
+                name="text"
+                class="input mb-4"
+                placeholder="Nom de la liste"
+                required
+              />
+
+              <div class="flex justify-center">
+                <button class="bg-blue-500 text-white px-2 py-1 rounded"
+                  >Ajouter</button
+                >
+              </div>
+            </form>
+            <form method="dialog">
+              <div class="flex justify-center">
+                <button class="bg-red-500 text-white px-2 py-1 rounded"
+                  >Annuler</button
+                >
+              </div>
+            </form>
           </div>
-        </form>
-        <form method="dialog">
-          <div class="flex justify-center">
-            <button class="bg-red-500 text-white px-2 py-1 rounded"
-              >Annuler</button
-            >
-          </div>
-        </form>
-      </div>
-    </ModalForm>
-    {/if}
-  </div>
-  <div
-    use:dndzone={{ items: lists, type: "list" }}
-    onconsider={handleConsider}
-    onfinalize={handleDrop}
-    class="flex gap-4 mt-4"
-  >
-    {#if lists.length}
-      {#each lists as list (list.id)}
-        <List bind:lists {list} />
-      {/each}
-    {:else}
-      <div
-        class="w-full h-64 flex items-center justify-center bg-gray-200 rounded-lg"
-      >
-        <p class="text-gray-500">No lists available</p>
-      </div>
-    {/if}
-  </div>
-</section>
-{:else} 
+        </ModalForm>
+      {/if}
+    </div>
+    <div
+      use:dndzone={{ items: lists, type: "list" }}
+      onconsider={handleConsider}
+      onfinalize={handleDrop}
+      class="flex gap-4 mt-4"
+    >
+      {#if lists.length}
+        {#each lists as list (list.id)}
+          <List bind:lists {list} />
+        {/each}
+      {:else}
+        <div
+          class="w-full h-64 flex items-center justify-center bg-gray-200 rounded-lg"
+        >
+          <p class="text-gray-500">No lists available</p>
+        </div>
+      {/if}
+    </div>
+  </section>
+{:else}
   <section class="container mx-auto pr-8">
     <div class="flex justify-center mt-4">
       <h1 class="text-2xl font-bold">
@@ -137,4 +154,4 @@
       </h1>
     </div>
   </section>
-{/if} 
+{/if}

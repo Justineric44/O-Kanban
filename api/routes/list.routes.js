@@ -4,13 +4,12 @@ import { validateListCreation, validateListUpdate } from '../middlewares/list.mi
 import { validateId } from '../middlewares/common.middleware.js';
 import { isAllowed } from '../middlewares/auth.middleware.js';
 
-// Ce routeur va gérer les routes liées aux listes
+
 const router = express.Router();
 
-// Routes pour les listes
 router.get('/', getAll);
 router.get('/:id', validateId, getById);
-router.post('/', isAllowed('admin'), validateListCreation, create);
+router.post('/', isAllowed("admin"), validateListCreation, create);
 router.patch('/:id', validateId, validateListUpdate, update);
 router.delete('/:id', validateId, deleteById);
 

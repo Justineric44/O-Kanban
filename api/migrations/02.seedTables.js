@@ -1,5 +1,13 @@
 import { Card, List, Tag, User, Role, sequelize } from "../models/index.js";
-import argon2 from "argon2";
+import argon2 from 'argon2';
+
+console.log("🚧 Ajout de roles de test...");
+const adminRole = await Role.create({name: "admin"});
+const userRole = await Role.create({name: "user"});
+
+console.log("🚧 Ajout de users de test...");
+await User.create({ username: "admin", password: await argon2.hash("admin"), role_id: adminRole.id});
+await User.create({ username: "Justine", password: await argon2.hash("Justine"), role_id: userRole.id });
 
 console.log("🚧 Ajout de listes de test...");
 const shoppingList  = await List.create({ title: "Liste des courses", position: 1 });
@@ -25,16 +33,6 @@ await coffeeCard.addTag(urgentTag);
 await coffeeCard.addTag(ecoTag);
 await momBirthday.addTag(urgentTag);
 await reblochonCard.addTag(urgentTag);
-
-console.log("🚧 Ajout de roles...");
-const adminRole = await Role.create({name: "admin"});
-const userRole = await Role.create({name: "user"});
-
-console.log("🚧 Ajout de users...");
-await User.create({username: "admin", password: await argon2.hash("admin"), role_id: adminRole.id});
-await User.create({username: "morgan", password: await argon2.hash("morgan"), role_id: userRole.id});
-
-
 
 console.log("✅ Migration OK ! Fermeture de la base..."); // On ferme le tunnel de connexion pour que le script s'arrête bien
 await sequelize.close();

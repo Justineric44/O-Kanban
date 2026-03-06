@@ -1,0 +1,31 @@
+@baseUrl = http://localhost:3000
+@TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJpYXQiOjE3NzI3MDYwNTQsImV4cCI6MTc3MjcwOTY1NH0.LlM2ks2SBEH9tmqtmr8o3-BxEnXAb4q6c7qr8wH1M7o
+@TOKENADMIN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJpYXQiOjE3NzI3MTMzNzksImV4cCI6MTc3MjcxNjk3OX0.1r_8Ewt5mFrSNIiycXbUmTX9ghyozcHmwQ16rj0vROQ
+
+### POST /prompt
+POST {{baseUrl}}/mistral/prompt
+Authorization: Bearer {{TOKEN}}
+Content-Type: application/json
+
+{
+  "prompt": "En une phrase, quelle est la couleur du ciel ?"
+}
+
+### POST /spellcheck
+POST {{baseUrl}}/mistral/spellcheck
+Authorization: Bearer {{TOKENADMIN}}
+Content-Type: application/json
+
+{
+  "text": "il é blieu, hein topette ! j'eme les socissses . pourkoi pas moua ?"
+}
+
+### POST /tranlaste
+POST {{baseUrl}}/mistral/translate
+Authorization: Bearer {{TOKENADMIN}}
+Content-Type: application/json
+
+{
+  "text": "Bonjour, je m'appelle Mistral et je suis une iA",
+  "lang": "Anglais"
+}

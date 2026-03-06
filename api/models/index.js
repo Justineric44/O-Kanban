@@ -6,19 +6,19 @@ import { User } from "./user.model.js";
 import { Role } from "./role.model.js";
 import { sequelize } from "./sequelize.client.js";
 
+// Role <--> User (One-to-Many)
 Role.hasMany(User, {
   as: "users",
   foreignKey: {
     name: "role_id",
-    allowNull: false
+    allowNull: false,
   },
   onDelete: "RESTRICT"
-})
-
+});
 User.belongsTo(Role, {
   as: "role",
   foreignKey: "role_id"
-})
+});
 
 // List <--> Card (One-to-Many)
 List.hasMany(Card, {

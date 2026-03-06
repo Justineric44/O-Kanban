@@ -19,9 +19,9 @@
     try {
       const { token, user } = await loginUser({ username, password });
 
-      // setAuth(user, token);
-
       setAuth(user, token);
+
+      // setAuth(username, token);
 
       const modal = document.getElementById(`login`);
       modal.close(); // Close the modal after adding the list

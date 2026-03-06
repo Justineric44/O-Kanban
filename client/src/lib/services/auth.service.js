@@ -14,7 +14,7 @@ export const loginUser = async (credentials) => {
   }).then((res) => res.json());
   return { token, user };
 
-  //return { token };
+  // return { token };
 };
 
 export const getUser = async () => {

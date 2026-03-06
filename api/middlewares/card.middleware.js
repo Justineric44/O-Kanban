@@ -1,7 +1,6 @@
 import Joi from "joi";
 import { checkBody } from "../utils/common.util.js";
 
-// Ce middleware va valider les données de création d'une carte
 export function validateCardCreation(req, res, next) {
     const createCardSchema = Joi.object({
         content: Joi.string().required(),
@@ -12,7 +11,6 @@ export function validateCardCreation(req, res, next) {
     checkBody(createCardSchema, req.body, res, next);
 }
 
-// Ce middleware va valider les données de mise à jour d'une carte
 export function validateCardUpdate(req, res, next) {
     const updateCardSchema = Joi.object({
         content: Joi.string(),
