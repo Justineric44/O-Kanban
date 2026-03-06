@@ -76,10 +76,18 @@
   let mistralResponse = $state("");
 
   // Fonction qui appelle le service et récupère la réponse
-  const handleMistralClick = async () => {
-    const response = await callMistral("Quel temps fait-il à Nantes ? Fait une phrase de 255 caractères maximum (sans préciser le nombre de caractères).");
+ const handleMistralClick = async () => {
+    const today = new Date();
+    const response = await callMistral("Quel temps fait-il à Nantes " + today + " ? Fait une phrase de 255 caractères maximum (sans préciser le nombre de caractères).");
     mistralResponse = response;
   };
+
+//    // Fonction qui appelle le service et récupère la réponse
+//  const checkMistralClick = async () => {
+//     const today = new Date();
+//     const response = await callMistral("corrige moi les fautes d''orthographe de cette phrase")
+//     mistralResponse = response;
+//   };
 </script>
 
 <Navbar />
