@@ -1,0 +1,6 @@
+[build]
+builder = "railpack"
+buildCommand = "npm run build"
+
+[deploy]
+startCommand = "caddy run --config /Caddyfile --adapter caddyfile"
